@@ -5,10 +5,12 @@
  */
 package app;
 
+import java.util.List;
 import model.Profesor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 
 /**
  *
@@ -20,34 +22,36 @@ public class App {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-          //CREAMOS CONEXION
+         //CREAMOS CONEXION
         //SessionFactory sessionFactory;
         //Configuration configuration = new Configuration();
         //configuration.configure();
         //sessionFactory = configuration.buildSessionFactory();
         SessionFactory factory = new Configuration().configure().buildSessionFactory(); 
-        
-        // CREAMOS UN OBJETO
-        Profesor profesor=new Profesor(80,"Pepe","Garcia","Perez");
-        
+      
         //CREAR UNA SESION
         Session session=factory.openSession();
-        session.beginTransaction();
         
-        //GUARDAR OBJETO
-        //session.save(profesor);
+        //CREAR CONSULTA
+        Query query=session.createQuery("SELECT p FROM Profesor p");
+        List<Profesor>profesores=query.list();
+        for(Profesor profesor : profesores){
+            System.out.println(profesor);
+        }
         
-        Profesor profesor2=(Profesor) session.get(Profesor.class, 1);
-        System.out.println(profesor2);
+        query=session.createQuery("SELECT p.id, p.nombre FROM Profesor p");
+        List<Object[]>listDatos=query.list();
+        for(Object[] datos : listDatos){
+            System.out.println(datos[0]+" -- "+datos[1]);
+        }
         
         
-        profesor.setNombre("Manola");
-        session.update(profesor);
+        query=session.createQuery("SELECT p.nombre FROM Profesor p");
+        List<Object>listNombres=query.list();
+        for(Object datos : listNombres){
+            System.out.println(datos);
+        }
         
-        //session.saveOrUpdate(profesor);
-        
-        //CERRAR CONEXION
-        session.getTransaction().commit();
         session.close();
         factory.close();
         
